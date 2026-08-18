@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Санарип Дени Соолук — Demo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-papVZ6Y1Yc+3Kkz0Yf0g6kqFf0Gq6x5Qx6q5Yb5Y6Yb5Y6Yb5Y6Yb5Y6Yb5Y6Yb5Y6" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}</style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!-- React, ReactDOM and Babel (for in-browser JSX transform) -->
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+// In-browser demo wrapper for the provided JSX app
+const { useState } = React;
+
+/* ================= MOCK DATA ================= */
+const DOCTOR_DB = [
+  {
+    passport: "ID1234567",
+    phone: "+996700123456",
+    email: "aigul.doc@minzdrav.kg",
+    name: "Айгуль Токтосунова",
+    specialty: "Терапевт",
+    photo: "https://placehold.co/160x160/0ea5a4/ffffff?text=Dr",
+  },
+];
+
+const PATIENTS_DB = [
+  {
+    id: 1,
+    passport: "AN0011223",
+    firstName: "Бакыт",
+    lastName: "Асанов",
+    dob: "12.04.1985",
+    photo: "https://placehold.co/160x160/1d4ed8/ffffff?text=Пациент",
+    height: 178,
+    weight: 82,
+    bloodType: "A(II) Rh+",
+    address: "г. Бишкек, ул. Чуй 123",
+    phone: "+996700111222",
+    email: "bakyt.asanov@example.com",
+    diagnoses: ["Гипертоническая болезнь II ст.", "Сахарный диабет 2 типа"],
+    routineMeds: [
+      { name: "Метформин", dose: "500 мг", freq: "2 раза в день" },
+      { name: "Лозартан", dose: "50 мг", freq: "1 раз в день, утром" },
+    ],
+    prescriptions: [
+      { date: "02.08.2026", doctor: "Айгуль Токтосунова", drug: "Амоксициллин 500мг", dose: "1 капсула x 3 раза в день, 7 дней" },
+      { date: "15.06.2026", doctor: "Нурлан Беков", drug: "Ибупрофен 400мг", dose: "1 таблетка при боли, макс 3 раза в день" },
+    ],
+    labResults: [
+      { date: "10.08.2026", name: "Общий анализ крови", status: "Готово" },
+      { date: "10.08.2026", name: "Глюкоза крови", status: "Готово" },
+    ],
+    imaging: [
+      { date: "05.07.2026", type: "МРТ поясничного отдела", by: "Радиолог: С. Иманалиева" },
+      { date: "20.03.2026", type: "УЗИ брюшной полости", by: "Радиолог: Т. Осмонов" },
+    ],
+    pathology: [{ date: "01.02.2025", name: "Биопсия кожи", result: "Доброкачественное образование" }],
+    surgeryEpicrisis: [],
+    policlinicVisits: [
+      { date: "10.08.2026", doctor: "Айгуль Токтосунова", note: "Плановый осмотр, жалоб нет." },
+    ],
+    icuEr: [],
+    vaccinations: [
+      { date: "2020", name: "COVID-19 (Sputnik V)", dose: "1 и 2 доза" },
+      { date: "2018", name: "Столбняк/Дифтерия (АДС)", dose: "Ревакцинация" },
+    ],
+    doctorNotes: [
+      { date: "10.08.2026", doctor: "Айгуль Токтосунова", text: "Пациент не соблюдает диету, повторно предупредить о рисках." },
+    ],
+  },
+];
+
+/* ================= SMALL UI HELPERS ================= */
+function Logo() {
+  return (
+    <div className="flex items-center gap-2">
+      <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+        <i className="fa-solid fa-heart-pulse text-white text-lg"></i>
+      </div>
+      <div className="text-white leading-tight">
+        <div className="font-bold text-lg">Санарип Дени Соолук</div>
+        <div className="text-xs text-teal-100">Кыргыз Республикасы</div>
+      </div>
+    </div>
+  );
+}
+
+function TopBar({ onHome }) {
+  return (
+    <div className="bg-gradient-to-r from-teal-600 to-blue-700 px-6 py-3 flex items-center justify-between shadow-md">
+      <button onClick={onHome} className="focus:outline-none"><Logo /></button>
+      <div className="text-white text-sm hidden md:block">Цифровая платформа медицинских данных</div>
+    </div>
+  );
+}
+
+function OtpBox({ value, onChange, onConfirm, target, onCancel, label }) {
+  return (
+    <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm mx-auto">
+      <div className="w-14 h-14 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i className="fa-solid fa-shield-halved text-teal-600 text-2xl"></i>
+      </div>
+      <h3 className="text-center font-bold text-gray-800 text-lg mb-1">{label || "Подтверждение кода"}</h3>
+      <p className="text-center text-gray-500 text-sm mb-5">Код отправлен на {target}</p>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        maxLength={6}
+        placeholder="• • • • • •"
+        className="w-full text-center tracking-[0.5em] text-2xl border-2 border-teal-200 rounded-xl py-3 mb-4 focus:outline-none focus:border-teal-500"
+      />
+      <button onClick={onConfirm} className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 rounded-xl transition mb-2">
+        Подтвердить
+      </button>
+      <button onClick={onCancel} className="w-full text-gray-500 text-sm py-2 hover:text-gray-700">Отмена</button>
+    </div>
+  );
+}
+
+/* ================= HOME ================= */
+function Home({ goTo }) {
+  const roles = [
+    { id: "doctor", title: "Кабинет врача", desc: "Вход по паспорту и телефону/email", icon: "fa-user-doctor", color: "from-teal-500 to-teal-700" },
+    { id: "patient", title: "Кабинет пациента", desc: "Вход по телефону или email", icon: "fa-user", color: "from-blue-500 to-blue-700" },
+  ];
+
+  React.useEffect(() => {
+    const handler = (e) => {
+      // Скрытый доступ для разработчика: Ctrl+Alt+A
+      if (e.ctrlKey && e.altKey && (e.key === "a" || e.key === "A")) {
+        goTo("adminLogin");
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <TopBar onHome={() => goTo("home")} />
+      <div className="max-w-5xl mx-auto px-6 py-16 text-center">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Единая электронная система здравоохранения</h1>
+        <p className="text-gray-500 mb-12">Выберите тип входа, чтобы продолжить</p>
+        <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          {roles.map((r) => (
+            <button key={r.id} onClick={() => goTo(r.id + "Login")}
+              className={`bg-gradient-to-br ${r.color} text-white rounded-2xl p-8 shadow-lg hover:scale-105 transition transform`}>
+              <i className={`fa-solid ${r.icon} text-4xl mb-4`}></i>
+              <div className="font-bold text-xl mb-1">{r.title}</div>
+              <div className="text-sm opacity-90">{r.desc}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+      {/* Незаметная точка внизу страницы — скрытый вход для разработчика/администратора */}
+      <div className="flex justify-center pb-4">
+        <button
+          onClick={() => goTo("adminLogin")}
+          title=""
+          aria-label="dev"
+          className="w-2 h-2 rounded-full bg-gray-200 hover:bg-gray-400 opacity-40 hover:opacity-100 transition"
+        ></button>
+      </div>
+    </div>
+  );
+}
+
+/* ================= DOCTOR LOGIN ================= */
+function DoctorLogin({ goTo, setDoctor }) {
+  const [step, setStep] = useState(1);
+  const [passport, setPassport] = useState("");
+  const [phone, setPhone] = useState("");
+  const [code, setCode] = useState("");
+  const [error, setError] = useState("");
+
+  const submitCreds = () => {
+    const doc = DOCTOR_DB.find((d) => d.passport === passport && (d.phone === phone || d.email === phone));
+    if (!doc) { setError("Врач с такими данными не найден. (Демо: используйте ID1234567 / +996700123456)"); return; }
+    setError("");
+    setStep(2);
+  };
+
+  const confirmOtp = () => {
+    const doc = DOCTOR_DB.find((d) => d.passport === passport);
+    setDoctor(doc);
+    goTo("doctorDashboard");
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <TopBar onHome={() => goTo("home")} />
+      <div className="flex items-center justify-center py-16 px-4">
+        {step === 1 ? (
+          <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
+            <i className="fa-solid fa-user-doctor text-teal-600 text-4xl mb-4 block text-center"></i>
+            <h3 className="text-center font-bold text-gray-800 text-lg mb-6">Вход для врача</h3>
+            <label className="text-sm text-gray-600">Номер паспорта</label>
+            <input value={passport} onChange={(e) => setPassport(e.target.value)}
+              placeholder="ID1234567" className="w-full border rounded-lg px-3 py-2 mb-4 mt-1 focus:outline-none focus:border-teal-500" />
+            <label className="text-sm text-gray-600">Телефон или Email</label>
+            <input value={phone} onChange={(e) => setPhone(e.target.value)}
+              placeholder="+996700123456" className="w-full border rounded-lg px-3 py-2 mb-1 mt-1 focus:outline-none focus:border-teal-500" />
+            {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
+            <button onClick={submitCreds} className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 rounded-xl mt-5">
+              Получить код подтверждения
+            </button>
+            <p className="text-xs text-gray-400 mt-4 text-center">Демо-доступ: ID1234567 / +996700123456</p>
+          </div>
+        ) : (
+          <OtpBox value={code} onChange={setCode} onConfirm={confirmOtp}
+            target={phone} onCancel={() => setStep(1)} label="Подтверждение входа врача" />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ================= PATIENT LOGIN ================= */
+function PatientLogin({ goTo, setPatient }) {
+  const [step, setStep] = useState(1);
+  const [contact, setContact] = useState("");
+  const [code, setCode] = useState("");
+  const [error, setError] = useState("");
+
+  const submit = () => {
+    const p = PATIENTS_DB.find((p) => p.phone === contact || p.email === contact);
+    if (!p) { setError("Пациент не найден. (Демо: +996700111222)"); return; }
+    setError(""); setStep(2);
+  };
+  const confirm = () => {
+    const p = PATIENTS_DB.find((p) => p.phone === contact || p.email === contact);
+    setPatient(p);
+    goTo("patientOwnProfile");
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <TopBar onHome={() => goTo("home")} />
+      <div className="flex items-center justify-center py-16 px-4">
+        {step === 1 ? (
+          <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
+            <i className="fa-solid fa-user text-blue-600 text-4xl mb-4 block text-center"></i>
+            <h3 className="text-center font-bold text-gray-800 text-lg mb-6">Вход для пациента</h3>
+            <label className="text-sm text-gray-600">Телефон или Email</label>
+            <input value={contact} onChange={(e) => setContact(e.target.value)}
+              placeholder="+996700111222" className="w-full border rounded-lg px-3 py-2 mb-1 mt-1 focus:outline-none focus:border-blue-500" />
+            {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
+            <button onClick={submit} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl mt-5">
+              Получить код подтверждения
+            </button>
+            <p className="text-xs text-gray-400 mt-4 text-center">Демо-доступ: +996700111222</p>
+          </div>
+        ) : (
+          <OtpBox value={code} onChange={setCode} onConfirm={confirm} target={contact} onCancel={() => setStep(1)} label="Подтверждение входа пациента" />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ================= ADMIN LOGIN ================= */
+function AdminLogin({ goTo }) {
+  const [user, setUser] = useState("");
+  const [pass, setPass] = useState("");
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <TopBar onHome={() => goTo("home")} />
+      <div className="flex items-center justify-center py-16 px-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
+          <i className="fa-solid fa-user-shield text-slate-700 text-4xl mb-4 block text-center"></i>
+          <h3 className="text-center font-bold text-gray-800 text-lg mb-6">Вход администратора</h3>
+          <label className="text-sm text-gray-600">Логин</label>
+          <input value={user} onChange={(e) => setUser(e.target.value)} className="w-full border rounded-lg px-3 py-2 mb-4 mt-1" />
+          <label className="text-sm text-gray-600">Пароль</label>
+          <input type="password" value={pass} onChange={(e) => setPass(e.target.value)} className="w-full border rounded-lg px-3 py-2 mb-5 mt-1" />
+          <button onClick={() => goTo("adminDashboard")} className="w-full bg-slate-700 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl">
+            Войти
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ================= ADMIN DASHBOARD ================= */
+function AdminDashboard({ goTo }) {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <TopBar onHome={() => goTo("home")} />
+      <div className="max-w-5xl mx-auto p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">Панель администратора</h2>
+          <button onClick={() => goTo("home")} className="text-red-500 text-sm"><i className="fa-solid fa-right-from-bracket mr-1"></i>Выход</button>
+        </div>
+        <div className="grid md:grid-cols-3 gap-4 mb-8">
+          {[
+            { label: "Врачи в системе", val: DOCTOR_DB.length, icon: "fa-user-doctor", color: "text-teal-600" },
+            { label: "Пациенты в системе", val: PATIENTS_DB.length, icon: "fa-users", color: "text-blue-600" },
+            { label: "Медучреждения", val: 1, icon: "fa-hospital", color: "text-slate-600" },
+          ].map((c, i) => (
+            <div key={i} className="bg-white rounded-xl shadow p-5">
+              <i className={`fa-solid ${c.icon} ${c.color} text-2xl mb-2`}></i>
+              <div className="text-2xl font-bold text-gray-800">{c.val}</div>
+              <div className="text-sm text-gray-500">{c.label}</div>
+            </div>
+          ))}
+        </div>
+        <div className="bg-white rounded-xl shadow p-5">
+          <h3 className="font-bold text-gray-800 mb-3">Список врачей</h3>
+          {DOCTOR_DB.map((d, i) => (
+            <div key={i} className="flex items-center gap-3 border-b py-3">
+              <img src={d.photo} className="w-10 h-10 rounded-full" />
+              <div>
+                <div className="font-semibold text-gray-800">{d.name}</div>
+                <div className="text-xs text-gray-500">{d.specialty} • Паспорт: {d.passport}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ================= DOCTOR DASHBOARD (SEARCH) ================= */
+function DoctorDashboard({ goTo, doctor, setActivePatient, setNeedsOtp }) {
+  const [query, setQuery] = useState("");
+  const [found, setFound] = useState(null);
+  const [notFound, setNotFound] = useState(false);
+
+  const search = () => {
+    const p = PATIENTS_DB.find(
+      (p) => p.passport.toLowerCase() === query.toLowerCase() ||
+        (p.firstName + " " + p.lastName).toLowerCase().includes(query.toLowerCase())
+    );
+    setFound(p || null);
+    setNotFound(!p);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <TopBar onHome={() => goTo("home")} />
+      <div className="max-w-3xl mx-auto p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <img src={doctor.photo} className="w-14 h-14 rounded-full border-2 border-teal-500" />
+          <div>
+            <div className="font-bold text-gray-800">{doctor.name}</div>
+            <div className="text-xs text-gray-500">{doctor.specialty} • Паспорт: {doctor.passport}</div>
+          </div>
+          <button onClick={() => goTo("home")} className="ml-auto text-red-500 text-sm"><i className="fa-solid fa-right-from-bracket mr-1"></i>Выход</button>
+        </div>
+
+        <div className="bg-white rounded-xl shadow p-5 mb-6">
+          <h3 className="font-bold text-gray-800 mb-3">Поиск пациента</h3>
+          <div className="flex gap-2">
+            <input value={query} onChange={(e) => setQuery(e.target.value)}
+              placeholder="Номер паспорта или Имя Фамилия (напр. AN0011223 или Бакыт Асанов)"
+              className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:border-teal-500" />
+            <button onClick={search} className="bg-teal-600 hover:bg-teal-700 text-white px-5 rounded-lg font-semibold">
+              <i className="fa-solid fa-magnifying-glass"></i>
+            </button>
+          </div>
+          {notFound && <p className="text-red-500 text-sm mt-3">Пациент не найден.</p>}
+        </div>
+
+        {found && (
+          <div className="bg-white rounded-xl shadow p-5 flex items-center gap-4">
+            <img src={found.photo} className="w-16 h-16 rounded-full" />
+            <div className="flex-1">
+              <div className="font-bold text-gray-800">{found.firstName} {found.lastName}</div>
+              <div className="text-xs text-gray-500">Паспорт: {found.passport} • Д.р.: {found.dob}</div>
+            </div>
+            <button
+              onClick={() => { setActivePatient(found); setNeedsOtp(true); goTo("patientOtpConfirm"); }}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold">
+              Запросить доступ <i className="fa-solid fa-lock ml-1"></i>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ================= PATIENT ACCESS OTP (doctor requesting) ================= */
+function PatientOtpConfirm({ goTo, patient }) {
+  const [code, setCode] = useState("");
+  const target = patient.phone || patient.email;
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <OtpBox value={code} onChange={setCode}
+        onConfirm={() => goTo("patientProfileDoctorView")}
+        target={target}
+        onCancel={() => goTo("doctorDashboard")}
+        label={`Код отправлен пациенту (${patient.firstName} ${patient.lastName})`}
+      />
+    </div>
+  );
+}
+
+/* ================= SIDEBAR ================= */
+const SIDEBAR_ITEMS = [
+  { key: "lab", label: "Лабораторные результаты", icon: "fa-flask" },
+  { key: "epicrisis", label: "Эпикриз", icon: "fa-file-medical" },
+  { key: "policlinic", label: "Поликлинические осмотры", icon: "fa-notes-medical" },
+  { key: "diagnoses", label: "Установленные диагнозы", icon: "fa-stethoscope" },
+  { key: "prescriptions", label: "Рецепты", icon: "fa-prescription" },
+  { key: "imaging", label: "Снимки / Изображения", icon: "fa-x-ray" },
+  { key: "pathology", label: "Результаты патологии", icon: "fa-microscope" },
+  { key: "surgery", label: "Операционный эпикриз", icon: "fa-scalpel" },
+  { key: "meds", label: "Постоянные лекарства", icon: "fa-pills" },
+  { key: "icu", label: "Реанимация / Скорая помощь", icon: "fa-truck-medical" },
+  { key: "vaccines", label: "Календарь прививок", icon: "fa-syringe" },
+];
+
+function Sidebar({ active, setActive, extra }) {
+  return (
+    <div className="w-full md:w-72 bg-white rounded-xl shadow p-3 space-y-1">
+      {SIDEBAR_ITEMS.map((it) => (
+        <button key={it.key} onClick={() => setActive(it.key)}
+          className={`w-full flex items-center gap-3 text-left px-3 py-2.5 rounded-lg text-sm transition ${active === it.key ? "bg-teal-600 text-white" : "text-gray-600 hover:bg-gray-100"}`}>
+          <i className={`fa-solid ${it.icon} w-4`}></i>{it.label}
+        </button>
+      ))}
+      {extra}
+    </div>
+  );
+}
+
+/* ================= PATIENT PROFILE CARD ================= */
+function ProfileCard({ patient, editable }) {
+  return (
+    <div className="bg-white rounded-xl shadow p-5 mb-4">
+      <div className="flex items-start gap-4">
+        <img src={patient.photo} className="w-24 h-24 rounded-xl object-cover" />
+        <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+          <div className="col-span-2 font-bold text-lg text-gray-800">{patient.firstName} {patient.lastName}</div>
+          <div className="text-gray-500">Дата рождения: <span className="text-gray-800">{patient.dob}</span></div>
+          <div className="text-gray-500">Паспорт: <span className="text-gray-800">{patient.passport}</span></div>
+          <div className="text-gray-500">Рост / Вес: <span className="text-gray-800">{patient.height} см / {patient.weight} кг</span></div>
+          <div className="text-gray-500">Группа крови: <span className="text-gray-800 font-semibold">{patient.bloodType}</span></div>
+          <div className="text-gray-500 col-span-2">Адрес: <span className={editable ? "text-gray-800" : "text-gray-400"}>{patient.address} {!editable && <i className="fa-solid fa-lock text-xs ml-1" title="Только чтение для врача"></i>}</span></div>
+          <div className="text-gray-500">Телефон: <span className="text-gray-800">{patient.phone}</span></div>
+          <div className="text-gray-500">Email: <span className="text-gray-800">{patient.email}</span></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ================= CONTENT PANELS ================= */
+function ContentPanel({ active, patient, isDoctor, onAddNote, notes }) {
+  const box = (title, children) => (
+    <div className="bg-white rounded-xl shadow p-5">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-bold text-gray-800">{title}</h3>
+        {isDoctor && <button className="text-xs bg-teal-50 text-teal-700 px-3 py-1.5 rounded-lg hover:bg-teal-100"><i className="fa-solid fa-upload mr-1"></i>Загрузить</button>}
+      </div>
+      {children}
+    </div>
+  );
+
+  if (active === "lab") return box("Лабораторные результаты", (
+    <ul className="space-y-2">
+      {patient.labResults.map((l, i) => (
+        <li key={i} className="flex justify-between border-b pb-2 text-sm">
+          <span>{l.name}</span><span className="text-gray-400">{l.date}</span>
+          <span className="text-green-600 font-medium">{l.status}</span>
+        </li>
+      ))}
+    </ul>
+  ));
+
+  if (active === "epicrisis") return box("Эпикриз", (
+    <p className="text-gray-400 text-sm">Загруженных эпикризов пока нет. {isDoctor && "Нажмите «Загрузить», чтобы добавить файл с компьютера."}</p>
+  ));
+
+  if (active === "policlinic") return box("Поликлинические осмотры", (
+    <ul className="space-y-3">
+      {patient.policlinicVisits.map((v, i) => (
+        <li key={i} className="text-sm border-b pb-2">
+          <div className="flex justify-between"><span className="font-semibold">{v.doctor}</span><span className="text-gray-400">{v.date}</span></div>
+          <p className="text-gray-600 mt-1">{v.note}</p>
+        </li>
+      ))}
+    </ul>
+  ));
+
+  if (active === "diagnoses") return box("Установленные диагнозы", (
+    <ul className="list-disc list-inside text-sm space-y-1 text-gray-700">
+      {patient.diagnoses.map((d, i) => <li key={i}>{d}</li>)}
+    </ul>
+  ));
+
+  if (active === "prescriptions") return box("Рецепты", (
+    <ul className="space-y-2">
+      {patient.prescriptions.map((p, i) => (
+        <li key={i} className="text-sm border-b pb-2">
+          <div className="flex justify-between"><span className="font-semibold">{p.drug}</span><span className="text-gray-400">{p.date}</span></div>
+          <p className="text-gray-600">{p.dose}</p>
+          <p className="text-xs text-gray-400">Врач: {p.doctor}</p>
+        </li>
+      ))}
+    </ul>
+  ));
+
+  if (active === "imaging") return box("Снимки / Изображения (DICOM)", (
+    <ul className="space-y-3">
+      {patient.imaging.map((im, i) => (
+        <li key={i} className="flex justify-between items-center border-b pb-2 text-sm">
+          <div>
+            <div className="font-semibold">{im.type}</div>
+            <div className="text-xs text-gray-400">{im.by} • {im.date}</div>
+          </div>
+          <button className="text-xs bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg hover:bg-blue-100"><i className="fa-solid fa-eye mr-1"></i>Открыть DICOM</button>
+        </li>
+      ))}
+    </ul>
+  ));
+
+  if (active === "pathology") return box("Результаты патологии / биопсии", (
+    <ul className="space-y-2 text-sm">
+      {patient.pathology.map((p, i) => (
+        <li key={i} className="border-b pb-2 flex justify-between"><span>{p.name}: {p.result}</span><span className="text-gray-400">{p.date}</span></li>
+      ))}
+    </ul>
+  ));
+
+  if (active === "surgery") return box("Операционный эпикриз", (
+    <p className="text-gray-400 text-sm">Записей об операциях нет.</p>
+  ));
+
+  if (active === "meds") return box("Постоянные лекарства", (
+    <ul className="space-y-2 text-sm">
+      {patient.routineMeds.map((m, i) => (
+        <li key={i} className="flex justify-between border-b pb-2"><span>{m.name}, {m.dose}</span><span className="text-gray-500">{m.freq}</span></li>
+      ))}
+    </ul>
+  ));
+
+  if (active === "icu") return box("Реанимация / Скорая помощь", (
+    <p className="text-gray-400 text-sm">Записей о госпитализации в реанимацию/скорую помощь нет.</p>
+  ));
+
+  if (active === "vaccines") return box("Календарь прививок", (
+    <ul className="space-y-2 text-sm">
+      {patient.vaccinations.map((v, i) => (
+        <li key={i} className="flex justify-between border-b pb-2"><span>{v.name} — {v.dose}</span><span className="text-gray-400">{v.date}</span></li>
+      ))}
+    </ul>
+  ));
+
+  return null;
+}
+
+/* ================= NEW PRESCRIPTION MODAL ================= */
+function PrescriptionModal({ onClose, onConfirmed, patient }) {
+  const [step, setStep] = useState(1);
+  const [drug, setDrug] = useState("");
+  const [dose, setDose] = useState("");
+  const [freq, setFreq] = useState("");
+  const [code, setCode] = useState("");
+
+  return (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+        {step === 1 ? (
+          <>
+            <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2"><i className="fa-solid fa-prescription text-teal-600"></i>Выписать рецепт — {patient.firstName} {patient.lastName}</h3>
+            <label className="text-sm text-gray-600">Название препарата</label>
+            <input value={drug} onChange={(e) => setDrug(e.target.value)} className="w-full border rounded-lg px-3 py-2 mb-3 mt-1" placeholder="напр. Амоксициллин 500мг" />
+            <label className="text-sm text-gray-600">Доза</label>
+            <input value={dose} onChange={(e) => setDose(e.target.value)} className="w-full border rounded-lg px-3 py-2 mb-3 mt-1" placeholder="напр. 1 капсула" />
+            <label className="text-sm text-gray-600">Периодичность / длительность</label>
+            <input value={freq} onChange={(e) => setFreq(e.target.value)} className="w-full border rounded-lg px-3 py-2 mb-5 mt-1" placeholder="напр. 3 раза в день, 7 дней" />
+            <div className="flex gap-2">
+              <button onClick={onClose} className="flex-1 py-2.5 rounded-lg border text-gray-600">Отмена</button>
+              <button onClick={() => setStep(2)} disabled={!drug || !dose} className="flex-1 py-2.5 rounded-lg bg-teal-600 text-white font-semibold disabled:opacity-40">Далее</button>
+            </div>
+          </>
+        ) : (
+          <OtpBox value={code} onChange={setCode}
+            onConfirm={() => onConfirmed({ drug, dose: dose + ", " + freq })}
+            target="телефон врача" onCancel={() => setStep(1)} label="Подтверждение выписки рецепта" />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ================= DOCTOR VIEW OF PATIENT ================= */
+function DoctorPatientView({ goTo, patient, setPatient, doctor }) {
+  const [active, setActive] = useState("lab");
+  const [showRx, setShowRx] = useState(false);
+  const [showRxSuccess, setShowRxSuccess] = useState(false);
+  const [noteText, setNoteText] = useState("");
+  const [notes, setNotes] = useState(patient.doctorNotes);
+
+  const confirmRx = (rx) => {
+    const newRx = { date: new Date().toLocaleDateString("ru-RU"), doctor: doctor.name, ...rx };
+    setPatient({ ...patient, prescriptions: [newRx, ...patient.prescriptions] });
+    setShowRx(false);
+    setShowRxSuccess(true);
+    setTimeout(() => setShowRxSuccess(false), 3500);
+  };
+
+  const addNote = () => {
+    if (!noteText.trim()) return;
+    setNotes([{ date: new Date().toLocaleDateString("ru-RU"), doctor: doctor.name, text: noteText }, ...notes]);
+    setNoteText("");
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <TopBar onHome={() => goTo("home")} />
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="flex items-center justify-between mb-4">
+          <button onClick={() => goTo("doctorDashboard")} className="text-sm text-teal-700"><i className="fa-solid fa-arrow-left mr-1"></i>Назад к поиску</button>
+          <div className="flex items-center gap-2">
+            <img src={doctor.photo} className="w-9 h-9 rounded-full" />
+            <span className="text-sm text-gray-600">{doctor.name}</span>
+          </div>
+        </div>
+
+        {showRxSuccess && (
+          <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-3 mb-4 text-sm flex items-center gap-2">
+            <i className="fa-solid fa-circle-check"></i> Рецепт успешно выписан. Уведомление отправлено пациенту.
+          </div>
+        )}
+
+        <ProfileCard patient={patient} editable={false} />
+
+        <div className="mb-4">
+          <button onClick={() => setShowRx(true)} className="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-lg font-semibold text-sm">
+            <i className="fa-solid fa-prescription mr-2"></i>Выписать рецепт
+          </button>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-4">
+          <Sidebar active={active} setActive={setActive}
+            extra={
+              <button onClick={() => setActive("notes")}
+                className={`w-full flex items-center gap-3 text-left px-3 py-2.5 rounded-lg text-sm transition mt-1 border-t pt-3 ${active === "notes" ? "bg-amber-500 text-white" : "text-amber-700 hover:bg-amber-50"}`}>
+                <i className="fa-solid fa-note-sticky w-4"></i>Заметки врачей
+              </button>
+            }
+          />
+          <div className="flex-1">
+            {active === "notes" ? (
+              <div className="bg-white rounded-xl shadow p-5">
+                <h3 className="font-bold text-gray-800 mb-1 flex items-center gap-2"><i className="fa-solid fa-note-sticky text-amber-500"></i>Заметки врачей (не видны пациенту)</h3>
+                <p className="text-xs text-gray-400 mb-4">Здесь можно оставить важную информацию для других врачей.</p>
+                <div className="flex gap-2 mb-4">
+                  <input value={noteText} onChange={(e) => setNoteText(e.target.value)} placeholder="Добавить заметку..." className="flex-1 border rounded-lg px-3 py-2 text-sm" />
+                  <button onClick={addNote} className="bg-amber-500 hover:bg-amber-600 text-white px-4 rounded-lg text-sm font-semibold">Добавить</button>
+                </div>
+                <ul className="space-y-2">
+                  {notes.map((n, i) => (
+                    <li key={i} className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm">
+                      <div className="flex justify-between text-xs text-gray-500 mb-1"><span className="font-semibold text-amber-800">{n.doctor}</span><span>{n.date}</span></div>
+                      {n.text}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <ContentPanel active={active} patient={patient} isDoctor={true} />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {showRx && <PrescriptionModal patient={patient} onClose={() => setShowRx(false)} onConfirmed={confirmRx} />}
+    </div>
+  );
+}
+
+/* ================= PATIENT OWN VIEW ================= */
+function PatientOwnView({ goTo, patient }) {
+  const [active, setActive] = useState("lab");
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <TopBar onHome={() => goTo("home")} />
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="flex justify-end mb-3">
+          <button onClick={() => goTo("home")} className="text-red-500 text-sm"><i className="fa-solid fa-right-from-bracket mr-1"></i>Выход</button>
+        </div>
+        <ProfileCard patient={patient} editable={false} />
+        <p className="text-xs text-gray-400 mb-4 -mt-2"><i className="fa-solid fa-lock mr-1"></i>Адрес и личные данные — только чтение. Изменение доступно в настройках профиля.</p>
+        <div className="flex flex-col md:flex-row gap-4">
+          <Sidebar active={active} setActive={setActive} />
+          <div className="flex-1">
+            <ContentPanel active={active} patient={patient} isDoctor={false} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ================= APP ================= */
+function App() {
+  const [view, setView] = useState("home");
+  const [doctor, setDoctor] = useState(null);
+  const [patient, setPatient] = useState(null); // logged-in patient
+  const [activePatient, setActivePatient] = useState(null); // patient being viewed by doctor
+
+  const goTo = (v) => setView(v);
+
+  if (view === "home") return <Home goTo={goTo} />;
+  if (view === "doctorLogin") return <DoctorLogin goTo={goTo} setDoctor={setDoctor} />;
+  if (view === "patientLogin") return <PatientLogin goTo={goTo} setPatient={setPatient} />;
+  if (view === "adminLogin") return <AdminLogin goTo={goTo} />;
+  if (view === "adminDashboard") return <AdminDashboard goTo={goTo} />;
+  if (view === "doctorDashboard") return <DoctorDashboard goTo={goTo} doctor={doctor} setActivePatient={setActivePatient} setNeedsOtp={() => {}} />;
+  if (view === "patientOtpConfirm") return <PatientOtpConfirm goTo={goTo} patient={activePatient} />;
+  if (view === "patientProfileDoctorView") return <DoctorPatientView goTo={goTo} patient={activePatient} setPatient={setActivePatient} doctor={doctor} />;
+  if (view === "patientOwnProfile") return <PatientOwnView goTo={goTo} patient={patient} />;
+
+  return <Home goTo={goTo} />;
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));
+
+    </script>
+  </body>
+</html>
