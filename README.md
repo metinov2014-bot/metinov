@@ -68,23 +68,21 @@ Bize Ulaşın · Gizlilik & KVKK · 404. Ayrıca `sitemap.xml`, `robots.txt`, `r
 
 ## Yayına alma adımları
 
-1. **GitHub Pages'i açın** — Settings → Pages → Source: *GitHub Actions*.
-2. **Depo değişkenini ekleyin** — Settings → Secrets and variables → Actions → Variables →
-   `ENABLE_PAGES = true`. (Bu değişken tanımlanmadan yayın adımı çalışmaz; depoyu yanlışlıkla
-   yayına almamak için böyle kurgulandı.)
-3. **Alan adını bağlayın** — `dist/CNAME` dosyası `content/site.json` içindeki `domain` alanından
+1. **GitHub Pages'i açın** — Settings → Pages → Source: *GitHub Actions*. Bu ayar yapılmadan
+   yayın adımı hata verir.
+2. **Alan adını bağlayın** — `dist/CNAME` dosyası `content/site.json` içindeki `domain` alanından
    üretilir. DNS'te `A` kayıtlarını GitHub Pages IP'lerine, `www` için `CNAME` kaydını
    `<kullanıcı>.github.io` adresine yönlendirin.
-4. **IndexNow anahtarı üretin:**
+3. **IndexNow anahtarı üretin:**
    ```bash
    node -e "console.log(require('crypto').randomBytes(16).toString('hex'))"
    ```
    Değeri `content/site.json` → `indexNowKey` alanına yazın (veya `INDEXNOW_KEY` secret'ı olarak
    ekleyin). Build, `https://eliferolbeauty.com/<anahtar>.txt` doğrulama dosyasını otomatik üretir.
-5. **Google Search Console** — alan adını doğrulayın ve `https://eliferolbeauty.com/sitemap.xml`
+4. **Google Search Console** — alan adını doğrulayın ve `https://eliferolbeauty.com/sitemap.xml`
    adresini bir kez gönderin. Google IndexNow'ı desteklemez; sitemap eklendikten sonra taramayı
    kendisi yürütür.
-6. **Google Business Profile** — sitedeki ad, adres ve telefon (NAP) ile birebir aynı olmalı.
+5. **Google Business Profile** — sitedeki ad, adres ve telefon (NAP) ile birebir aynı olmalı.
    Yerel SEO'nun en güçlü sinyali budur; `content/site.json` ile işletme profilini eşitleyin.
 
 Statik çıktı olduğu için Netlify, Vercel, Cloudflare Pages veya klasik bir hosting'e de

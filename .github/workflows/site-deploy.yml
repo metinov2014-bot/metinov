@@ -51,9 +51,6 @@ jobs:
           path: dist
 
   deploy:
-    # GitHub Pages'i açtıktan sonra depo değişkeni olarak ENABLE_PAGES=true tanımlayın
-    # (Settings → Secrets and variables → Actions → Variables).
-    if: vars.ENABLE_PAGES == 'true'
     needs: build
     runs-on: ubuntu-latest
     environment:
@@ -64,7 +61,6 @@ jobs:
         uses: actions/deploy-pages@v4
 
   notify-search-engines:
-    if: vars.ENABLE_PAGES == 'true'
     needs: deploy
     runs-on: ubuntu-latest
     steps:
