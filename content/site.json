@@ -1,0 +1,45 @@
+{
+  "name": "Elif Erol Beauty",
+  "legalName": "Elif Erol Güzellik Salonu",
+  "tagline": "Bahçeşehir'in güzellik adresi",
+  "domain": "https://eliferolbeauty.com",
+  "locale": "tr_TR",
+  "lang": "tr",
+  "description": "Bahçeşehir'de protez tırnak, lazer epilasyon, cilt bakımı, kirpik & kaş ve saç bakımı hizmetleri. Elif Erol Beauty ile bakımlı ve özgüvenli bir görünüm.",
+  "founded": "2018",
+  "priceRange": "$$",
+  "email": "info@eliferolbeauty.com",
+  "phone": "+905387950823",
+  "phoneDisplay": "0538 795 08 23",
+  "phoneAlt": "+905550402193",
+  "phoneAltDisplay": "0555 040 21 93",
+  "whatsapp": "905387950823",
+  "whatsappMessage": "Merhaba, Elif Erol Beauty'den randevu almak istiyorum.",
+  "address": {
+    "street": "Bahçeşehir 1. Kısım Mah. Sakarya Cad. No:36/I (File Market üstü)",
+    "district": "Başakşehir",
+    "city": "İstanbul",
+    "region": "İstanbul",
+    "postalCode": "34488",
+    "country": "TR"
+  },
+  "geo": { "lat": 41.0433, "lng": 28.6706 },
+  "mapsUrl": "https://maps.google.com/?q=Elif+Erol+G%C3%BCzellik+Salonu+Bah%C3%A7e%C5%9Fehir",
+  "mapsEmbed": "https://www.google.com/maps?q=Bah%C3%A7e%C5%9Fehir%201.%20K%C4%B1s%C4%B1m%20Sakarya%20Caddesi%20No%3A36%20%C4%B0stanbul&output=embed",
+  "rating": { "value": "4.9", "count": "90" },
+  "hours": [
+    { "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], "opens": "09:30", "closes": "20:00", "label": "Pazartesi – Cumartesi", "time": "09:30 – 20:00" },
+    { "days": ["Sunday"], "opens": "11:00", "closes": "18:00", "label": "Pazar", "time": "11:00 – 18:00" }
+  ],
+  "social": {
+    "instagram": "https://www.instagram.com/eliferol_beauty/",
+    "facebook": "https://www.facebook.com/people/Elif-Erol-G%C3%BCzellik-Merkezleri/",
+    "yandex": "https://yandex.com.tr/maps/org/elif_erol_guzellik_salonu/",
+    "tiktok": ""
+  },
+  "instagramHandle": "eliferol_beauty",
+  "areaServed": ["Bahçeşehir", "Başakşehir", "Esenyurt", "Beylikdüzü", "Ispartakule", "Hoşdere", "Kayaşehir", "Bahçeşehir 1. Kısım", "Bahçeşehir 2. Kısım"],
+  "brandColors": { "ink": "#241a1d", "rose": "#b76e79", "gold": "#c9a227", "cream": "#fbf7f4" },
+  "indexNowKey": "",
+  "analytics": { "ga4": "", "gsc": "" }
+}
