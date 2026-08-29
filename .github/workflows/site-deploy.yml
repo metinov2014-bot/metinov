@@ -1,0 +1,76 @@
+name: Site — build & deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "content/**"
+      - "src/**"
+      - "scripts/**"
+      - "package.json"
+      - ".github/workflows/site-deploy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Higgsfield ile üretilen görselleri CDN'den indirip siteye gömer.
+      - name: Görselleri indir
+        run: npm run assets
+
+      - name: Siteyi üret
+        run: npm run build
+
+      # Hata varsa yayına çıkmadan durur (uyarılar engellemez).
+      - name: SEO denetimi
+        run: npm run audit -- --report seo-report.md
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: seo-report
+          path: seo-report.md
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  notify-search-engines:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm run build
+      - name: IndexNow bildirimi
+        env:
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+        # Anahtar tanımlı değilse iş akışını kırmadan geçer.
+        run: npm run indexnow || echo "IndexNow atlandı (anahtar tanımlı değil)"

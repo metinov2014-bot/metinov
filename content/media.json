@@ -1,0 +1,59 @@
+{
+  "_comment": "Higgsfield (nano_banana_pro) ile üretilen görseller. `npm run assets` komutu bunları src/assets/img/ altına indirir; dosya yoksa build CDN adresini kullanır.",
+  "images": {
+    "salon": {
+      "file": "salon.png",
+      "remote": "https://d8j0ntlcm91z4.cloudfront.net/user_3HxoKbeo8DRksSilScmLliA8Ryo/hf_20260829_093128_0eb0ddbd-6be1-4dd4-bc28-5f1659fd6202.png",
+      "alt": "Elif Erol Beauty Bahçeşehir salonunun krem ve rose-gold tonlardaki iç mekanı",
+      "width": 1568, "height": 882
+    },
+    "protez-tirnak": {
+      "file": "protez-tirnak.png",
+      "remote": "https://d8j0ntlcm91z4.cloudfront.net/user_3HxoKbeo8DRksSilScmLliA8Ryo/hf_20260829_093127_cc04be3e-458b-4a6c-96e0-a16019294ec4.png",
+      "alt": "Nude French uygulamalı badem formunda protez tırnaklar",
+      "width": 1280, "height": 960
+    },
+    "kalici-oje": {
+      "file": "kalici-oje.png",
+      "remote": "https://d8j0ntlcm91z4.cloudfront.net/user_3HxoKbeo8DRksSilScmLliA8Ryo/hf_20260829_093137_7577d63c-47df-48f1-b5a0-8aed5f818875.png",
+      "alt": "Salonda kalıcı oje uygulaması yapan manikürist",
+      "width": 1280, "height": 960
+    },
+    "lazer-epilasyon": {
+      "file": "lazer-epilasyon.png",
+      "remote": "https://d8j0ntlcm91z4.cloudfront.net/user_3HxoKbeo8DRksSilScmLliA8Ryo/hf_20260829_093127_85f85a36-34c6-438d-916c-4ddf7deac3ed.png",
+      "alt": "Buz başlıklı diode lazer epilasyon cihazıyla yapılan uygulama",
+      "width": 1280, "height": 960
+    },
+    "cilt-bakimi": {
+      "file": "cilt-bakimi.png",
+      "remote": "https://d8j0ntlcm91z4.cloudfront.net/user_3HxoKbeo8DRksSilScmLliA8Ryo/hf_20260829_093127_4533654d-357d-4674-9b5f-13c917075b0b.png",
+      "alt": "Hydrafacial cilt bakımı uygulaması sırasında nemlenen cilt",
+      "width": 1280, "height": 960
+    },
+    "kirpik-kas": {
+      "file": "kirpik-kas.png",
+      "remote": "https://d8j0ntlcm91z4.cloudfront.net/user_3HxoKbeo8DRksSilScmLliA8Ryo/hf_20260829_093127_5da41235-84fd-4856-b4a9-edd8947444b6.png",
+      "alt": "Volume ipek kirpik ve laminasyonlu kaş yakın çekimi",
+      "width": 1280, "height": 960
+    },
+    "manikur-pedikur": {
+      "file": "manikur-pedikur.png",
+      "remote": "https://d8j0ntlcm91z4.cloudfront.net/user_3HxoKbeo8DRksSilScmLliA8Ryo/hf_20260829_093127_185b3a9e-fa0f-40d1-8786-c848837ea7dd.png",
+      "alt": "Gül yapraklı seramik ayak banyosuyla spa pedikür hazırlığı",
+      "width": 1280, "height": 960
+    },
+    "sac-bakimi": {
+      "file": "sac-bakimi.png",
+      "remote": "https://d8j0ntlcm91z4.cloudfront.net/user_3HxoKbeo8DRksSilScmLliA8Ryo/hf_20260829_093127_c7f6a766-29c4-4b15-b54f-76c28e9bb5dc.png",
+      "alt": "Keratin bakımı sonrası parlak ve sağlıklı saçlar",
+      "width": 1280, "height": 960
+    },
+    "logo": {
+      "file": "logo.png",
+      "remote": "https://d8j0ntlcm91z4.cloudfront.net/user_3HxoKbeo8DRksSilScmLliA8Ryo/hf_20260829_093127_1cbc2097-868e-49df-beb1-619683ab7eb2.png",
+      "alt": "Elif Erol Beauty logosu",
+      "width": 1024, "height": 1024
+    }
+  }
+}
